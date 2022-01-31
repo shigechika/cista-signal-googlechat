@@ -13,7 +13,7 @@ def get_updated_at(filename):
             return f.read().strip()
     except FileNotFoundError as e:
         print(e)
-        return "2021/01/31 00:00:00"
+        return "2022/01/31 00:00:00"
     except Exception as e:
         print(e)
         raise e
@@ -60,14 +60,15 @@ def cista_signal_googlechat():
 
     msgs = sorted(json_dict["provide_messages"], key=lambda x: x["id"])
     for msg in msgs:
-        print(msg["id"], msg["tlp"], msg["created_at"], msg["priority"], msg["subject"])
+        print(msg["id"], msg["created_at"], msg["priority"], msg["subject"])
         if msg["tlp"] == "RED":
             continue
+        subject = msg["subject"].replace("\\t", "")
         text = msg["body"].replace("\\r\\n", "\n")
         if msg["created_at"] == msg["updated_at"]:
-            chat_text = f"*{msg['subject']}*\n_公開日時：{msg['created_at']}_\n\n{text}"
+            chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
         else:
-            chat_text = f"*{msg['subject']}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
+            chat_text = f"*{subject}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
 
         req = urllib.request.Request(
             url=webhook_url, data=json.dumps({"text": chat_text}).encode("utf-8")
