@@ -64,7 +64,11 @@ def cista_signal_googlechat():
         if msg["tlp"] == "RED":
             continue
         subject = msg["subject"].replace("\\t", "")
-        text = msg["body"].replace("\\r\\n", "\n")
+        text = msg["body"].replace("\\r", "").replace("\\n", "\n")
+        if len(text) >= 4000:
+            # limit 4000 char
+            lastlf = text[0:3980].rindex('\n')
+            text = text[0:lastlf] + "\n\n✂︎✂︎✂︎以下略✂︎✂︎✂︎"
         if msg["created_at"] == msg["updated_at"]:
             chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
         else:
