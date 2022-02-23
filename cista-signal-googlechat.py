@@ -29,6 +29,33 @@ def put_updated_at(filename):
         raise e
 
 
+def googlechat(webhook_url, text, thread=None):
+    if len(text) >= 4000:
+        is_long = True
+        lastlf = text[0:3998].rindex("\n")
+        chat_text = text[0:lastlf] + "↩️"
+    else:
+        is_long = False
+        chat_text = text
+
+    if thread is None:
+        data = json.dumps({"text": chat_text})
+    else:
+        data = json.dumps({"text": chat_text, "thread": thread})
+
+    req = urllib.request.Request(url=webhook_url, data=data.encode("utf-8"))
+    req.add_header("Content-Type", "application/json; charset=UTF-8")
+    try:
+        with urllib.request.urlopen(req) as res:
+            body = res.read().decode("utf-8")
+            j = json.loads(body)
+            thread = j["thread"]
+            if is_long is True:
+                googlechat(webhook_url, text[lastlf:], thread)
+    except Exception as e:
+        raise e
+
+
 def cista_signal_googlechat():
     config = configparser.ConfigParser()
     config.read("config.ini")
@@ -60,29 +87,22 @@ def cista_signal_googlechat():
 
     msgs = sorted(json_dict["provide_messages"], key=lambda x: x["id"])
     for msg in msgs:
-        print(msg["id"], msg["created_at"], msg["priority"], msg["subject"])
+        print(
+            msg["id"],
+            msg["created_at"],
+            msg["priority"],
+            len(msg["body"]),
+            msg["subject"],
+        )
         if msg["tlp"] == "RED":
             continue
         subject = msg["subject"].replace("\\t", "")
         text = msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
-        if len(text) >= 4000:
-            # limit 4000 char
-            lastlf = text[0:3980].rindex("\n")
-            text = text[0:lastlf] + "\n\n✂︎✂︎✂︎以下略✂︎✂︎✂︎"
         if msg["created_at"] == msg["updated_at"]:
             chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
         else:
             chat_text = f"*{subject}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
-
-        req = urllib.request.Request(
-            url=webhook_url, data=json.dumps({"text": chat_text}).encode("utf-8")
-        )
-        req.add_header("Content-Type", "application/json; charset=UTF-8")
-        try:
-            with urllib.request.urlopen(req) as res:
-                body = res.read().decode("utf-8")
-        except Exception as e:
-            raise e
+        googlechat(webhook_url, chat_text)
 
     put_updated_at(config.get("cista", "updated_at")),
 
