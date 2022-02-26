@@ -47,8 +47,8 @@ def put_updated_at(filename):
 def googlechat(webhook_url, text, thread=None):
     if len(text) >= 4000:
         is_long = True
-        lastlf = text[0:3998].rindex("\n")
-        chat_text = text[0:lastlf] + "↩️"
+        lastlf = text[0:3997].rindex("\n\n")
+        chat_text = text[0:lastlf] + "↕️️"
     else:
         is_long = False
         chat_text = text
