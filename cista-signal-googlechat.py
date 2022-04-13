@@ -48,7 +48,7 @@ def googlechat(webhook_url, text, thread=None):
     if len(text) >= 4000:
         is_long = True
         lastlf = text[0:3997].rindex("\n\n")
-        chat_text = text[0:lastlf] + "↕️️"
+        chat_text = text[0:lastlf] + "\n↕️️"
     else:
         is_long = False
         chat_text = text
