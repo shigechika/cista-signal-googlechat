@@ -37,8 +37,8 @@ def get_updated_at(filename):
 def put_updated_at(filename):
     try:
         with open(filename, mode="w", newline='\n') as f:
-            # YYYY-MM-DD hh:mm:ss
-            f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S") + '\n')
+            # YYYY/MM/DD hh:mm
+            f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M") + '\n')
     except Exception as e:
         print(e)
         raise e
