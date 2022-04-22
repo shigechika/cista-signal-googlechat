@@ -78,7 +78,7 @@ def googlechat(webhook_url, text, thread=None):
     else:
         data = json.dumps({"text": chat_text, "thread": thread})
 
-    req = urllib.request.Request(url=webhook_url, data=data.encode("utf-8"))
+    req = urllib.request.Request(url=webhook_url, data=data.encode("utf-8"), method="POST")
     req.add_header("Content-Type", "application/json; charset=UTF-8")
     try:
         with urllib.request.urlopen(req) as res:
@@ -130,7 +130,7 @@ def cista_signal_googlechat():
             continue
         subject = msg["subject"].replace("\\t", "")
         logger.info(
-            f'{msg["id"]}, {msg["created_at"]}, {msg["updated_at"]}, {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
+            f'{msg["id"]} {msg["created_at"]} {msg["updated_at"]} {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
         )
         text = msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
         if msg["created_at"] == msg["updated_at"]:
