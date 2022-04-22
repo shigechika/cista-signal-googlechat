@@ -130,7 +130,7 @@ def cista_signal_googlechat():
             continue
         subject = msg["subject"].replace("\\t", "")
         logger.info(
-            f'{msg["id"]} {msg["created_at"]}, {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
+            f'{msg["id"]}, {msg["created_at"]}, {msg["updated_at"]}, {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
         )
         text = msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
         if msg["created_at"] == msg["updated_at"]:
@@ -142,7 +142,7 @@ def cista_signal_googlechat():
     if json_dict["total"] > 0:
         put_updated_at(config.get("cista", "updated_at"))
     else:
-        logger.debug("NO HIT, NO UPDATE.")
+        logger.debug("No Hit, No Update.")
 
 
 if __name__ == "__main__":
