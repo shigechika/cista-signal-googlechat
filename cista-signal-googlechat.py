@@ -19,28 +19,48 @@ import json
 import configparser
 import datetime
 import os
+import logging
+import argparse
+
+
+def set_parser_args(parser):
+    LOG_LEVEL = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    USER_CHOICE = LOG_LEVEL + list(map(lambda w: w.lower(), LOG_LEVEL))
+    parser.add_argument(
+        "--log", help="set log level", choices=USER_CHOICE, default="WARNING"
+    )
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    set_parser_args(parser)
+    return parser.parse_args()
 
 
 def get_updated_at(filename):
     try:
         with open(filename) as f:
             # chop \r \n
-            return f.read().strip()
+            dt = f.read().strip()
+            logger.debug(dt)
+            return dt
     except FileNotFoundError as e:
-        print(e)
+        logger.error(e)
         return "2022/01/31 00:00:00"
     except Exception as e:
-        print(e)
+        logger.error(f)
         raise e
 
 
 def put_updated_at(filename):
     try:
-        with open(filename, mode="w", newline='\n') as f:
+        with open(filename, mode="w", newline="\n") as f:
             # YYYY/MM/DD hh:mm
-            f.write(datetime.datetime.now().strftime("%Y/%m/%d %H:%M") + '\n')
+            dt = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+            logger.debug(dt)
+            f.write(dt + "\n")
     except Exception as e:
-        print(e)
+        logger.error(f)
         raise e
 
 
@@ -68,6 +88,7 @@ def googlechat(webhook_url, text, thread=None):
             if is_long is True:
                 googlechat(webhook_url, text[lastlf:], thread)
     except Exception as e:
+        logger.critical(res)
         raise e
 
 
@@ -87,9 +108,10 @@ def cista_signal_googlechat():
         "order": "ASC",
     }
 
+    logger.debug(params)
     p = urllib.parse.urlencode(params)
     req = urllib.request.Request(
-        url=signal_base_url + "/api/v2/provide/messages.json?" + p
+        url=signal_base_url + "/api/v2/provide/messages.json?" + p, method="GET"
     )
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
     req.add_header("x-api-key", signal_api_key)
@@ -97,21 +119,19 @@ def cista_signal_googlechat():
         with urllib.request.urlopen(req) as res:
             body = res.read().decode("utf-8")
             json_dict = json.loads(body)
+            logger.debug(f'HIT : {json_dict["total"]}')
     except Exception as e:
+        logger.critical(res)
         raise e
 
     msgs = sorted(json_dict["provide_messages"], key=lambda x: x["id"])
     for msg in msgs:
-        print(
-            msg["id"],
-            msg["created_at"],
-            msg["priority"],
-            len(msg["body"]),
-            msg["subject"],
-        )
         if msg["tlp"] == "RED":
             continue
         subject = msg["subject"].replace("\\t", "")
+        logger.info(
+            f'{msg["id"]}\t{msg["created_at"]}\t{msg["priority"]}\t{len(msg["body"])}\t{msg["subject"]}'
+        )
         text = msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
         if msg["created_at"] == msg["updated_at"]:
             chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
@@ -119,8 +139,21 @@ def cista_signal_googlechat():
             chat_text = f"*{subject}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
         googlechat(webhook_url, chat_text)
 
-    put_updated_at(config.get("cista", "updated_at")),
+    if json_dict["total"] > 0:
+        put_updated_at(config.get("cista", "updated_at"))
+    else:
+        logger.debug("NO HIT, NO UPDATE.")
 
 
 if __name__ == "__main__":
+    args = parse_arguments()
+    # parse log level
+    numeric_level = getattr(logging, args.log.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError("Invalid log level: %s" % loglevel)
+    logging.basicConfig(
+        level=numeric_level,
+        format="%(asctime)s %(name)s:%(lineno)s %(funcName)s [%(levelname)s]: %(message)s",
+    )
+    logger = logging.getLogger("cista-signal-googlechat")
     cista_signal_googlechat()
