@@ -130,7 +130,7 @@ def cista_signal_googlechat():
             continue
         subject = msg["subject"].replace("\\t", "")
         logger.info(
-            f'{msg["id"]}\t{msg["created_at"]}\t{msg["priority"]}\t{len(msg["body"])}\t{msg["subject"]}'
+            f'{msg["id"]} {msg["created_at"]}, {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
         )
         text = msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
         if msg["created_at"] == msg["updated_at"]:
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         raise ValueError("Invalid log level: %s" % loglevel)
     logging.basicConfig(
         level=numeric_level,
-        format="%(asctime)s %(name)s:%(lineno)s %(funcName)s [%(levelname)s]: %(message)s",
+        format="%(name)s:%(lineno)s %(funcName)s [%(levelname)s]: %(message)s",
     )
     logger = logging.getLogger("cista-signal-googlechat")
     cista_signal_googlechat()
