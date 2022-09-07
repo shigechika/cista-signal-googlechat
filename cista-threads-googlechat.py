@@ -78,7 +78,9 @@ def googlechat(webhook_url, text, thread=None):
     else:
         data = json.dumps({"text": chat_text, "thread": thread})
 
-    req = urllib.request.Request(url=webhook_url, data=data.encode("utf-8"), method="POST")
+    req = urllib.request.Request(
+        url=webhook_url, data=data.encode("utf-8"), method="POST"
+    )
     req.add_header("Content-Type", "application/json; charset=UTF-8")
     try:
         with urllib.request.urlopen(req) as res:
@@ -101,8 +103,8 @@ def cista_threads_googlechat():
     organization_id = config.get("cista", "organization_id")
     params = {
         "OID": organization_id,
-        "provide_category":"all",
-        "status":"all",
+        "provide_category": "all",
+        "status": "all",
         "q[predicate]": "range",
         "q[start]": get_updated_at(config.get("cista", "updated_at")),
         "q[attribute]": "updated_at",
