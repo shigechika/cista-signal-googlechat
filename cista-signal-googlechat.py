@@ -207,7 +207,7 @@ class cista_signal:
             self.googlechat(chat_text)
 
         if json_dict["total"] > 0:
-            put_updated_at()
+            self.put_updated_at()
         else:
             self.logger.debug("No Hit, No Update.")
 
