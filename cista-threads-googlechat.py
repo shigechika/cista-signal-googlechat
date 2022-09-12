@@ -108,7 +108,7 @@ class cista_signal:
                 j = json.loads(body)
                 thread = j["thread"]
                 if is_long is True:
-                    googlechat(self.webhook_url, text[lastlf:], thread)
+                    self.googlechat(text[lastlf:], thread)
         except Exception as e:
             self.logger.critical(res)
             raise e
@@ -155,7 +155,7 @@ class cista_signal:
                 chat_text = f"*{title}*\n_公開日時：{msg['created_at']}_\n\n{text}"
             else:
                 chat_text = f"*{title}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
-            googlechat(self.webhook_url, chat_text)
+            self.googlechat(chat_text)
 
         if json_dict["total"] > 0:
             self.put_updated_at()
@@ -204,7 +204,7 @@ class cista_signal:
                 chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
             else:
                 chat_text = f"*{subject}*\n_~公開日時：{msg['created_at']}~　更新日時：{msg['updated_at']}_\n\n{text}"
-            googlechat(self.webhook_url, chat_text)
+            self.googlechat(chat_text)
 
         if json_dict["total"] > 0:
             put_updated_at()
