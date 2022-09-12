@@ -1,5 +1,5 @@
 # cista-signal-googlechat
-CISTA Signal to Google Chat
+CISTA(Collective Intelligence Station for Trusted Advocates) Signal to Google Chat
 
 # example
 
