@@ -44,7 +44,7 @@ class cista_signal:
         self.filename = self.config.get("cista", "updated_at")
         self.updated_at = self.get_updated_at()
         self.signal_api_method = self.config.get(
-            "cista", "signal_api_method", fallback=None
+            "cista", "signal_api_method", fallback="threads"
         )
 
     def set_parser_args(self, parser):
@@ -216,6 +216,7 @@ class cista_signal:
             self.messages_googlechat()
         else:
             self.threads_googlechat()
+
 
 if __name__ == "__main__":
     cs = cista_signal()
