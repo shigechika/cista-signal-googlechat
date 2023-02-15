@@ -193,7 +193,7 @@ class cista_signal:
         for msg in msgs:
             if msg["tlp"] == "RED":
                 continue
-            subject = msg["subject"].replace("\\t", "")
+            subject = msg["subject"].replace("\\t", "").strip()
             self.logger.info(
                 f'{msg["id"]} {msg["created_at"]} {msg["updated_at"]} {msg["priority"]} {len(msg["body"])} {msg["subject"]}'
             )
