@@ -201,7 +201,12 @@ class cista_signal:
             text = (
                 msg["body"].replace("\\r", "").replace("\\n", "\n").replace("\\t", "\t")
             )
-            text = re.sub(r"-----BEGIN PGP SIGNATURE-----([\r\n\S]*)-----END PGP SIGNATURE-----", "-----PGP署名省略-----", text, re.MULTILINE)
+            text = re.sub(
+                r"-----BEGIN PGP SIGNATURE-----([\r\n\S]*)-----END PGP SIGNATURE-----",
+                "〜〜〜PGP署名省略〜〜〜",
+                text,
+                re.MULTILINE,
+            )
 
             if msg["created_at"] == msg["updated_at"]:
                 chat_text = f"*{subject}*\n_公開日時：{msg['created_at']}_\n\n{text}"
